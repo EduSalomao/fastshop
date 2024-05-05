@@ -1,5 +1,6 @@
 import { SQLStatementArg } from "expo-sqlite";
 import db from "./SQLiteDatabase";
+import { Category } from "../../interfaces/Category";
 
 /**
  * INICIALIZAÇÃO DA TABELA
@@ -11,9 +12,47 @@ db.transaction((tx) => {
   //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
 
   tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS annotations (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, content TEXT);"
+    "CREATE TABLE IF NOT EXISTS categorys (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, color TEXT);"
+  );
+
+  tx.executeSql(
+    "SELECT COUNT(*) AS count FROM categorys;",
+    [],
+    (_, { rows }) => {
+      const { count } = rows.item(0);
+      if (count === 0) {
+
+        addDefaultCategories(tx);
+      }
+    },
+    (_, error) => {
+      console.log("Error checking category table:", error);
+      return false;
+    }
   );
 });
+
+const addDefaultCategories = (tx) => {
+  const categories = [
+    { name: "Carne", color: "#DC143C" } as Category,
+    { name: "Fruta", color: "#FFA500" } as Category,
+    { name: "Verdura", color: "#32CD32" } as Category
+  ];
+
+  categories.forEach((category) => {
+    tx.executeSql(
+      "INSERT INTO categorys (name, color) VALUES (?, ?);",
+      [category.name, category.color],
+      (_, { rowsAffected, insertId }) => {
+        if (rowsAffected > 0) console.log(`Category '${category.name}' added with ID: ${insertId}`);
+        else console.log(`Error inserting category: ${category.name}`);
+      },
+      (_, error) => {
+        console.log(`Error adding category: ${category.name}`, error);
+      }
+    );
+  });
+};
 
 /**
  * CRIAÇÃO DE UM NOVO REGISTRO
@@ -27,8 +66,8 @@ export const create = (obj) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        "INSERT INTO annotations (created_at, content) values (?, ?);",
-        [obj.created_at, obj.content],
+        "INSERT INTO categorys (name, color) values (?, ?);",
+        [obj.name, obj.color],
         //-----------------------
         (_, { rowsAffected, insertId }) => {
           if (rowsAffected > 0) resolve(insertId);
@@ -55,8 +94,8 @@ export const update = (id, obj) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        "UPDATE annotations SET created_at=?, content=?, WHERE id=?;",
-        [obj.created_at, obj.content, id],
+        "UPDATE categorys SET name?, color?, WHERE id=?;",
+        [obj.created_at, obj.product_name, obj.product_category, id],
         //-----------------------
         (_, { rowsAffected }) => {
           if (rowsAffected > 0) resolve(rowsAffected);
@@ -83,7 +122,7 @@ export const find = (id: SQLStatementArg) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        "SELECT * FROM annotations WHERE id=?;",
+        "SELECT * FROM categorys WHERE id=?;",
         [id],
         //-----------------------
         (_, { rows }) => {
@@ -91,8 +130,8 @@ export const find = (id: SQLStatementArg) => {
           else reject("Obj not found: id=" + id); // nenhum registro encontrado
         },
         (_, error) => {
-          reject(error); 
-          return false; 
+          reject(error);
+          return false;
         }
       );
     });
@@ -113,12 +152,12 @@ export const all = () => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        "SELECT * FROM annotations;",
+        "SELECT * FROM categorys;",
         [],
         //-----------------------
         (_, { rows }) => resolve(rows._array),
         (_, error) => {
-          reject(error); 
+          reject(error);
           return false;
         }
       );
@@ -138,7 +177,7 @@ export const remove = (id) => {
     db.transaction((tx) => {
       //comando SQL modificável
       tx.executeSql(
-        "DELETE FROM annotations WHERE id=?;",
+        "DELETE FROM products WHERE id=?;",
         [id],
         //-----------------------
         (_, { rowsAffected }) => {

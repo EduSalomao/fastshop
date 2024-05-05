@@ -1,18 +1,22 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../routes/InitialRoute";
-import { BottomTab } from "../routes/BottomTabNavigator";
 import { LinearGradient } from "expo-linear-gradient";
-import colors from "../assets/colors/colors";
+import { useCategoryStore } from "../hooks/CategoryStore";
+import { Category } from "../interfaces/Category";
+import { all } from "../services/sqlite/Categorys";
 
 export const SplashScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
+  const { setCategoryData } = useCategoryStore();
 
   useEffect(() => {
-    setTimeout(() => {
+    const loadCategories = async () => {
+      const categories = (await all()) as Category[];
+      await setCategoryData(categories);
       setIsLoading(false);
       navigation.reset({
         index: 0,
@@ -20,7 +24,9 @@ export const SplashScreen = () => {
       } as {
         routes: RootStackParamList[keyof RootStackParamList][];
       });
-    }, 2000);
+    };
+
+    loadCategories();
   }, [navigation]);
 
   return (

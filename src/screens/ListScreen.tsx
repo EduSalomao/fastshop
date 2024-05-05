@@ -4,9 +4,8 @@ import { StyleSheet, View, Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import colors from "../assets/colors/colors";
 
-import { BottomTab } from "../routes/BottomTabNavigator";
 import { ButtonAdd } from "../components/ButtonAdd";
-import { AnnotationsContainer } from "../components/AnnotationsContainer";
+import { AnnotationsContainer } from "../components/ProductContainer";
 
 export const ListScreen = () => {
   return (
@@ -44,5 +43,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     maxHeight: "60%",
     marginTop: 70,
+    backgroundColor: colors.background,
   },
 });

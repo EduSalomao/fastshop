@@ -6,15 +6,16 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import colors from "../assets/colors/colors";
-import { useAnnotationStore } from "../hooks/AnnotationStore";
-import { remove } from "../services/sqlite/annotations";
+import { useProductsStore } from "../hooks/ProductStore";
+import { remove } from "../services/sqlite/Products";
+import { find } from "../services/sqlite/Products";
 
 export const AnnotationCard = (props) => {
   const [swipedLeft, setSwipedLeft] = useState(false);
 
   const handleSwipe = () => {
     setSwipedLeft(true);
-    useAnnotationStore.getState().removeAnnotation(props.id);
+    useProductsStore.getState().removeProducts(props.id);
     remove(props.id);
   };
 
@@ -38,7 +39,13 @@ export const AnnotationCard = (props) => {
         onSwipeableWillOpen={handleSwipe}
       >
         <View style={styles.annotationContainer}>
-          <Text style={styles.text}>{props.content}</Text>
+          <Text style={styles.text}>{props.productName}</Text>
+          <View
+            style={[
+              { backgroundColor: props.categoryColor },
+              styles.categoryColor,
+            ]}
+          />
         </View>
       </Swipeable>
     </View>
@@ -61,9 +68,17 @@ const styles = StyleSheet.create({
   },
   annotationContainer: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    alignItems: "center",
     height: hp("10%"),
     borderRadius: 15,
     backgroundColor: "#DFDDDD",
+    flexDirection: "row",
+  },
+  categoryColor: {
+    width: "20%",
+    height: "25%",
+    borderRadius: 15,
+    marginRight: 20,
   },
 });

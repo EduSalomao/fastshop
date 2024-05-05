@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import colors from "../assets/colors/colors";
-import { AnnotationCreateModal } from "./AnnotationCreateModal";
+import { AnnotationCreateModal } from "./ProductCreateModal";
 
 export const ButtonAdd = () => {
   const [modalVisible, setModalVisible] = useState(false);
